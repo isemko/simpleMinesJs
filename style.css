@@ -20,3 +20,6 @@ span{
 .is-empty{
 	background-color: #f2f2f2;
 }
+.is-flagged{
+	background-color: #0a84c1;
+}

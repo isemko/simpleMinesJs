@@ -5,7 +5,9 @@ var Mine = (function() {
     excludeIndxs = [],
     numMines = 12,
     listener,
-    brdRow;
+    brdRow,
+    flagged = false,
+    foundCount = 0;
 
   return {
     setChecks: function(brdRowLength) {
@@ -87,7 +89,26 @@ var Mine = (function() {
     },
     findBomb: function(clickedCellIndex) {
       var spns = document.querySelectorAll('span');
+      if (flagged) {
+        if (spns[clickedCellIndex].className.indexOf('is-flagged') === -1) {
+          spns[clickedCellIndex].className += ' is-flagged';
+          if (brd[clickedCellIndex] === 2) {
+            foundCount++;
+          }
+          //spns[clickedCellIndex].removeEventListener('click', listener);
+        } else {
+          // spns[clickedCellIndex].addEventListener('click', listener);
+          spns[clickedCellIndex].className = spns[clickedCellIndex].className.split('is-flagged').join();
+          // console.log();
+          if (brd[clickedCellIndex] === 2) {
+            foundCount--;
+          }
+        }
+        if(foundCount === numMines){
+          console.log('solved');
+        }
 
+      } else
       if (brd[clickedCellIndex] === 2) {
         spns[clickedCellIndex].className += ' is-mine';
       } else {
@@ -119,7 +140,7 @@ var Mine = (function() {
         }
       }
     },
-    outPutBoard: function(id, size, minesCount) {
+    outPutBoard: function(id, flagId, size, minesCount) {
 
       brd = [];
       brdRow = size ? size : 8;
@@ -128,8 +149,7 @@ var Mine = (function() {
       if (size < 4) {
         console.log('size is too small');
         return;
-      }
-      else if (minesCount >=  size * size) {
+      } else if (minesCount >= size * size) {
         console.log('too many mines');
         return;
       }
@@ -137,6 +157,7 @@ var Mine = (function() {
       this.setBoard(size * size);
       this.setChecks(brdRow);
       var boardEl = document.querySelector('#' + id),
+        flaggedEl = document.querySelector('#' + flagId),
         boardHTML = '',
         this_ = this;
 
@@ -146,6 +167,10 @@ var Mine = (function() {
           boardHTML += '<br/>';
         }
       }
+
+      flaggedEl.addEventListener('click', function() {
+        flagged = !flagged;
+      });
 
       boardEl.innerHTML = boardHTML;
 
