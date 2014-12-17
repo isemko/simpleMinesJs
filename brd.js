@@ -129,7 +129,7 @@ var Mine = (function() {
         console.log('size is too small');
         return;
       }
-      else if (minesCount >  size * size) {
+      else if (minesCount >=  size * size) {
         console.log('too many mines');
         return;
       }
