@@ -1,6 +1,9 @@
+'use strict';
+
 var Mine = (function() {
   var brd = [],
     checks = [],
+    excludeIndxs = [],
     numMines = 12,
     listener,
     brdRow;
@@ -50,12 +53,38 @@ var Mine = (function() {
           }
         }
       }
+
       return count;
+
     },
     applyEmpty: function(spn, indx) {
       spn.className += ' is-empty';
       spn.removeEventListener('click', listener);
-      spn.innerHTML = this.findNeighborBombs(indx);
+      var checkedIndex = this.findNeighborBombs(indx);
+      spn.innerHTML = checkedIndex;
+      excludeIndxs.push(indx);
+      if (checkedIndex === 0) {
+        for (var f = 0; f < checks.length; f++) {
+          if (brd[indx + checks[f]]) {
+            
+           if ((indx + 1) % brdRow === 0) {
+                if (checks[f] !== (brdRow + 1) && checks[f] !== -(brdRow - 1) && checks[f] !== 1) {
+                  this.findBomb(indx + checks[f]);
+                }
+              } else if ((indx) % brdRow === 0 || indx === 0 && excludeIndxs.indexOf(indx + checks[f]) === -1) {
+                //if left row
+                if (checks[f] !== -(brdRow + 1) && checks[f] !== (brdRow - 1) && checks[f] !== -1 && excludeIndxs.indexOf(indx + checks[f]) === -1) {
+                  this.findBomb(indx + checks[f]);
+                }
+              } else {
+                if (excludeIndxs.indexOf(indx+ checks[f]) === -1) {
+                  this.findBomb(indx + checks[f]);
+                }
+
+              }
+          }
+        }
+      }
     },
     findBomb: function(clickedCellIndex) {
       var spns = document.querySelectorAll('span');
@@ -64,22 +93,25 @@ var Mine = (function() {
         spns[clickedCellIndex].className += ' is-mine';
       } else {
         spns[clickedCellIndex].className += ' is-empty';
-        var rowLength = Math.sqrt(brd.length);
         for (var j = 0; j < checks.length; j++) {
           if (typeof(brd[clickedCellIndex + checks[j]]) !== undefined) {
+            spns[clickedCellIndex].innerHTML = this.findNeighborBombs(clickedCellIndex);
             if (brd[clickedCellIndex + checks[j]] === 1) {
               //if right row
-              if ((clickedCellIndex + 1) % rowLength === 0) {
-                if (checks[j] !== (brdRow + 1) && checks[j] !== -(brdRow - 1) && checks[j] !== 1) {
+              if ((clickedCellIndex + 1) % brdRow === 0) {
+                if (checks[j] !== (brdRow + 1) && checks[j] !== -(brdRow - 1) && checks[j] !== 1 && excludeIndxs.indexOf(clickedCellIndex + checks[j]) === -1) {
                   this.applyEmpty(spns[clickedCellIndex + checks[j]], clickedCellIndex + checks[j]);
                 }
-              } else if ((clickedCellIndex) % rowLength === 0 || clickedCellIndex === 0) {
+              } else if ((clickedCellIndex) % brdRow === 0 || clickedCellIndex === 0 && excludeIndxs.indexOf(clickedCellIndex + checks[j]) === -1) {
                 //if left row
-                if (checks[j] !== -(brdRow + 1) && checks[j] !== (brdRow - 1) && checks[j] !== -1) {
+                if (checks[j] !== -(brdRow + 1) && checks[j] !== (brdRow - 1) && checks[j] !== -1 && excludeIndxs.indexOf(clickedCellIndex + checks[j]) === -1) {
                   this.applyEmpty(spns[clickedCellIndex + checks[j]], clickedCellIndex + checks[j]);
                 }
               } else {
-                this.applyEmpty(spns[clickedCellIndex + checks[j]], clickedCellIndex + checks[j]);
+                if (excludeIndxs.indexOf(clickedCellIndex + checks[j]) === -1) {
+                  this.applyEmpty(spns[clickedCellIndex + checks[j]], clickedCellIndex + checks[j]);
+                }
+
               }
             } else {
               if (spns[clickedCellIndex + checks[j]]) {}
@@ -94,10 +126,9 @@ var Mine = (function() {
       numMines = minesCount ? minesCount : numMines;
 
       if (size < 4) {
-         console.log('size is too small');
-         return;
-       }
-       
+        console.log('size is too small');
+        return;
+      }
 
       this.setBoard(size * size);
       this.setChecks(brdRow);
