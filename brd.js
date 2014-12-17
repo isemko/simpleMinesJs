@@ -1,6 +1,5 @@
-'use strict';
-
 var Mine = (function() {
+  'use strict';
   var brd = [],
     checks = [],
     excludeIndxs = [],
@@ -15,7 +14,6 @@ var Mine = (function() {
     setBoard: function(size) {
       var rnd = 0;
       var ranIndexes = [];
-      var exclude = [];
       for (var x = 0; x < numMines; x++) {
         rnd = Math.floor((Math.random() * (size - 1)) + 1);
         if (ranIndexes.indexOf(rnd) === -1) {
@@ -57,6 +55,7 @@ var Mine = (function() {
       return count;
 
     },
+    findPos: function() {},
     applyEmpty: function(spn, indx) {
       spn.className += ' is-empty';
       spn.removeEventListener('click', listener);
@@ -66,22 +65,22 @@ var Mine = (function() {
       if (checkedIndex === 0) {
         for (var f = 0; f < checks.length; f++) {
           if (brd[indx + checks[f]]) {
-            
-           if ((indx + 1) % brdRow === 0) {
-                if (checks[f] !== (brdRow + 1) && checks[f] !== -(brdRow - 1) && checks[f] !== 1) {
-                  this.findBomb(indx + checks[f]);
-                }
-              } else if ((indx) % brdRow === 0 || indx === 0 && excludeIndxs.indexOf(indx + checks[f]) === -1) {
-                //if left row
-                if (checks[f] !== -(brdRow + 1) && checks[f] !== (brdRow - 1) && checks[f] !== -1 && excludeIndxs.indexOf(indx + checks[f]) === -1) {
-                  this.findBomb(indx + checks[f]);
-                }
-              } else {
-                if (excludeIndxs.indexOf(indx+ checks[f]) === -1) {
-                  this.findBomb(indx + checks[f]);
-                }
 
+            if ((indx + 1) % brdRow === 0) {
+              if (checks[f] !== (brdRow + 1) && checks[f] !== -(brdRow - 1) && checks[f] !== 1) {
+                this.findBomb(indx + checks[f]);
               }
+            } else if ((indx) % brdRow === 0 || indx === 0 && excludeIndxs.indexOf(indx + checks[f]) === -1) {
+              //if left row
+              if (checks[f] !== -(brdRow + 1) && checks[f] !== (brdRow - 1) && checks[f] !== -1 && excludeIndxs.indexOf(indx + checks[f]) === -1) {
+                this.findBomb(indx + checks[f]);
+              }
+            } else {
+              if (excludeIndxs.indexOf(indx + checks[f]) === -1) {
+                this.findBomb(indx + checks[f]);
+              }
+
+            }
           }
         }
       }
@@ -130,6 +129,11 @@ var Mine = (function() {
         return;
       }
 
+      if (minesCount > size) {
+        console.log('too many mines');
+        return;
+      }
+
       this.setBoard(size * size);
       this.setChecks(brdRow);
       var boardEl = document.querySelector('#' + id),
@@ -153,5 +157,5 @@ var Mine = (function() {
         item.addEventListener('click', listener);
       });
     }
-  }
+  };
 }());
