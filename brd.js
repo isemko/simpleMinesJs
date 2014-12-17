@@ -119,8 +119,9 @@ var Mine = (function() {
         }
       }
     },
-    outputBoard: function(id, size, minesCount) {
+    outPutBoard: function(id, size, minesCount) {
 
+      brd = [];
       brdRow = size ? size : 8;
       numMines = minesCount ? minesCount : numMines;
 
@@ -128,8 +129,7 @@ var Mine = (function() {
         console.log('size is too small');
         return;
       }
-
-      if (minesCount > size) {
+      else if (minesCount >  size * size) {
         console.log('too many mines');
         return;
       }
