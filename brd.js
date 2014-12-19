@@ -3,6 +3,7 @@ var Mine = (function() {
   var brd = [],
     checks = [],
     excludeIndxs = [],
+    flaggedSquares = [],
     numMines = 12,
     listener,
     brdRow,
@@ -104,7 +105,7 @@ var Mine = (function() {
             foundCount--;
           }
         }
-        if(foundCount === numMines){
+        if (foundCount === numMines) {
           console.log('solved');
         }
 
@@ -157,8 +158,7 @@ var Mine = (function() {
       this.setBoard(size * size);
       this.setChecks(brdRow);
       var boardEl = document.querySelector('#' + id),
-        flaggedEl = document.querySelector('#' + flagId),
-        boardHTML = '',
+        boardHTML = '<button class="flagged">flag</button><br/>',
         this_ = this;
 
       for (var k = 0, kl = brd.length; k < kl; k++) {
@@ -168,11 +168,11 @@ var Mine = (function() {
         }
       }
 
-      flaggedEl.addEventListener('click', function() {
+      boardEl.innerHTML = boardHTML;
+
+      document.querySelector('.flagged').addEventListener('click', function() {
         flagged = !flagged;
       });
-
-      boardEl.innerHTML = boardHTML;
 
       listener = function() {
         this_.findBomb(parseInt(this.className));
