@@ -64,7 +64,7 @@ var Mine = (function() {
 
       var checkedCount = this.findNeighborBombs(indx);
 
-      if (checkedCount > 0 && flaggedSquares.indexOf(indx) !== -1) {
+      if (flaggedSquares.indexOf(indx) === -1) {
         spn.innerHTML = checkedCount;
         spn.removeEventListener('click', listener);
       }
@@ -125,7 +125,7 @@ var Mine = (function() {
 
             notFlag = flaggedSquares.indexOf(clickedCellIndex) === -1;
             var cnt = this.findNeighborBombs(clickedCellIndex);
-            if (cnt > 0 && notFlag) {
+            if (notFlag) {
               spns[clickedCellIndex].innerHTML = cnt;
             }
 
