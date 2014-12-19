@@ -61,11 +61,15 @@ var Mine = (function() {
     findPos: function() {},
     applyEmpty: function(spn, indx) {
       spn.className += ' is-empty';
-      spn.removeEventListener('click', listener);
-      var checkedIndex = this.findNeighborBombs(indx);
-      spn.innerHTML = checkedIndex;
+
+      var checkedCount = this.findNeighborBombs(indx);
+
+      if (checkedCount > 0 && flaggedSquares.indexOf(indx) !== -1) {
+        spn.innerHTML = checkedCount;
+        spn.removeEventListener('click', listener);
+      }
       excludeIndxs.push(indx);
-      if (checkedIndex === 0) {
+      if (checkedCount === 0) {
         for (var f = 0; f < checks.length; f++) {
           if (brd[indx + checks[f]]) {
 
@@ -90,17 +94,19 @@ var Mine = (function() {
     },
     findBomb: function(clickedCellIndex) {
       var spns = document.querySelectorAll('span');
+      var notFlag = true;
       if (flagged) {
         if (spns[clickedCellIndex].className.indexOf('is-flagged') === -1) {
           spns[clickedCellIndex].className += ' is-flagged';
+          flaggedSquares.push(clickedCellIndex);
           if (brd[clickedCellIndex] === 2) {
             foundCount++;
           }
-          //spns[clickedCellIndex].removeEventListener('click', listener);
         } else {
-          // spns[clickedCellIndex].addEventListener('click', listener);
+
           spns[clickedCellIndex].className = spns[clickedCellIndex].className.split('is-flagged').join();
-          // console.log();
+          flaggedSquares.splice(flaggedSquares.indexOf(clickedCellIndex), 1);
+
           if (brd[clickedCellIndex] === 2) {
             foundCount--;
           }
@@ -108,15 +114,21 @@ var Mine = (function() {
         if (foundCount === numMines) {
           console.log('solved');
         }
-
       } else
       if (brd[clickedCellIndex] === 2) {
         spns[clickedCellIndex].className += ' is-mine';
+        spns[clickedCellIndex].removeEventListener(listener);
       } else {
         spns[clickedCellIndex].className += ' is-empty';
         for (var j = 0; j < checks.length; j++) {
           if (typeof(brd[clickedCellIndex + checks[j]]) !== undefined) {
-            spns[clickedCellIndex].innerHTML = this.findNeighborBombs(clickedCellIndex);
+
+            notFlag = flaggedSquares.indexOf(clickedCellIndex) === -1;
+            var cnt = this.findNeighborBombs(clickedCellIndex);
+            if (cnt > 0 && notFlag) {
+              spns[clickedCellIndex].innerHTML = cnt;
+            }
+
             if (brd[clickedCellIndex + checks[j]] === 1) {
               //if right row
               if ((clickedCellIndex + 1) % brdRow === 0) {
@@ -157,8 +169,9 @@ var Mine = (function() {
 
       this.setBoard(size * size);
       this.setChecks(brdRow);
+
       var boardEl = document.querySelector('#' + id),
-        boardHTML = '<button class="flagged">flag</button><br/>',
+        boardHTML = '<button class="flagged">flag</button>',
         this_ = this;
 
       for (var k = 0, kl = brd.length; k < kl; k++) {
